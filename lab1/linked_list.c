@@ -55,4 +55,105 @@ void linked_list_append(node *head, int val){
 }
 
 /* your implementation goes here */
+void linked_list_insert(node *head, int val, int index){
+	if (index < 0 || index > head->count) return;
+	node *cur = head;
+	node *new_node;
+	while( index > 0) {
+		cur = cur->next;
+		index--;
+	}
+	new_node = (node*)malloc(sizeof(node));
+	new_node->value = val;
+	new_node->next = cur->next;
+	cur->next = new_node;
+	head->count++;
+}
 
+void linked_list_delete(node *head, int index){
+	if (index < 0 || index >= head->count) return;
+	node *cur = head;
+        while(index > 0){
+	  cur = cur->next;
+	  index--;
+	}
+	node *next = cur->next;
+	node *last = next->next;
+	cur->next = last;
+ 	free(next);
+	head->count--;	
+}
+
+void linked_list_remove(node *head, int val){
+	node *cur = head;
+	node *pre;
+	while(cur->next != NULL){
+		pre = cur;
+		cur = cur->next;
+		if (cur->value == val) {
+			pre->next = cur->next;
+			free(cur);
+			head->count--;
+			return;
+		}
+	}
+}
+
+void linked_list_remove_all(node *head, int val){
+	node *cur = head;
+	node  *pre;
+	while(cur->next != NULL){
+		pre = cur;
+		cur = cur->next;
+		if (cur->value == val) {
+			pre->next = cur->next;
+			head->count--;
+			cur = pre;
+		}
+	}
+}
+
+int linked_list_get(node *head, int index){
+	if (index < 0 || index >= head->count) return -0x80000000;
+	node *cur = head;
+	while(index >= 0){
+	    cur = cur->next;
+	    index--;
+	}
+	return cur->value;
+
+}
+
+int linked_list_search(node *head, int val){
+	int index = 0;
+	node *cur = head;
+	while(cur->next != NULL){
+		cur = cur->next;
+		if (cur->value == val){
+			return index;
+		}
+		index++;
+	}
+	return -1;
+}
+
+node *linked_list_search_all(node *head, int val) {
+	node *rst_head = linked_list_init();
+	node *rst_cur = rst_head;
+	node *cur = head;
+	int index = 0;
+	while(cur->next != NULL){
+		cur = cur->next;
+		if (cur->value == val) {
+		   node *target = (node*)malloc(sizeof(node));
+		   target->value = index;
+		   target->next = NULL;
+
+		   rst_cur->next = target;
+		   rst_cur = rst_cur->next;
+		   rst_head->count++;
+		}
+		index++;
+	}
+	return rst_head;
+}
