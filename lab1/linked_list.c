@@ -113,6 +113,7 @@ void linked_list_remove_all(node *head, int val){
 	}
 }
 
+<<<<<<< HEAD
 int linked_list_get(node *head, int index){
 	if (index < 0 || index >= head->count) return -0x80000000;
 	node *cur = head;
@@ -156,4 +157,32 @@ node *linked_list_search_all(node *head, int val) {
 		index++;
 	}
 	return rst_head;
+=======
+void linked_list_insert(node *head, int val, int index){
+
+}
+
+void linked_list_delete(node *head, int index){
+
+}
+
+void linked_list_remove(node *head, int val){
+
+}
+
+void linked_list_remove_all(node *head, int val){
+
+}
+
+int linked_list_get(node *head, int index){
+    return 0;
+}
+
+int linked_list_search(node *head, int val){
+    return 0;
+}
+
+node *linked_list_search_all(node *head, int val){
+    return linked_list_init();
+>>>>>>> 442326270a6d942bf71b96cb5dac61e216b89457
 }
