@@ -1,0 +1,8 @@
+int func_1(int a)
+{
+  return 3a;
+}
+int func_2(int x, y)
+{
+  return (x + y);
+}

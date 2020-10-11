@@ -1,0 +1,6 @@
+int main() {
+    int a = 0x123, b = 123;
+    char c = 'c';
+    float d = .1, e = 1.;
+    return 0;
+}

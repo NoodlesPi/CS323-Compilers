@@ -1,0 +1,5 @@
+// single comment
+/* single comment */
+int main() {
+    return 0;
+}

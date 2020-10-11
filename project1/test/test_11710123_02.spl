@@ -1,0 +1,13 @@
+int kule(int n)
+{
+  int res = 1;
+  while (n >= 0)
+  {
+    while (p <= 0 ) {
+        p = p - 1;
+    }
+    res = res * n;
+    n = n - 1;
+  }
+  return res;
+}
