@@ -2,6 +2,7 @@
     #include"lex.yy.c"
 
     FILE *fout = NULL;
+    Node *root;
 
     #define _MISSING_SEMI_ERROR(e) { \
         has_error = 1; \
@@ -28,7 +29,7 @@
 %}
 
 %union {
-    Node* node;
+    class Node *node;
 }
 
 %token <node> INT FLOAT CHAR 
@@ -60,168 +61,118 @@
 
 /* high-level definition */
 Program: 
-    ExtDefList {
-        $$ = newInternalNode("Program", 1, $1);
-        if (!has_error) printSyntaxTree($$, 0);
-    }
+    ExtDefList { root = new Node("Program", "", $1->line_num, 1, $1); }
     ;
 ExtDefList:
-    ExtDef ExtDefList { $$ = newInternalNode("ExtDefList", 2, $1, $2); }
-    | %empty { $$ = newInternalNode("Empty", -1); }
+    ExtDef ExtDefList { $$ = new Node("ExtDefList", "", $1->line_num, 2, $1, $2); }
+    | %empty { $$ = new Node("ExtDefList", "", yylineno, 0); }
     ;
 ExtDef:
-    Specifier ExtDecList SEMI { $$ = newInternalNode("ExtDef", 3, $1, $2, $3); }
-    | Specifier SEMI { $$ = newInternalNode("ExtDef", 2, $1, $2); }
-    | Specifier FunDec CompSt { $$ = newInternalNode("ExtDef", 3, $1, $2, $3); }
+    Specifier ExtDecList SEMI { $$ = new Node("ExtDef", "", $1->line_num, 3, $1, $2, $3); }
+    | Specifier SEMI { $$ = new Node("ExtDef", "", $1->line_num, 2, $1, $2); }
+    | Specifier FunDec CompSt { $$ = new Node("ExtDef", "", $1->line_num, 3, $1, $2, $3); }
     ;
 ExtDecList:
-    VarDec { $$ = newInternalNode("ExtDecList", 1, $1); }
-    | VarDec COMMA ExtDecList { $$ = newInternalNode("ExtDecList", 3, $1, $2, $3); }
+    VarDec { $$ = new Node("ExtDecList", "", $1->line_num, 1, $1); }
+    | VarDec COMMA ExtDecList { $$ = new Node("ExtDecList", "", $1->line_num, 3, $1, $2, $3); }
     ;
 
 /* specifier */
 Specifier:
-    TYPE { $$ = newInternalNode("Specifier", 1, $1); }
-    | StructSpecifier { $$ = newInternalNode("Specifier", 1, $1); }
+    TYPE { $$ = new Node("Specifier", "", $1->line_num, 1, $1); }
+    | StructSpecifier { $$ = new Node("Specifier", "", $1->line_num, 1, $1); }
     ;
 StructSpecifier:
-    STRUCT ID LC DefList RC { $$ = newInternalNode("StructSpecifier", 5, $1, $2, $3, $4, $5); }
-    | STRUCT ID { $$ = newInternalNode("StructSpecifier", 2, $1, $2); }
+    STRUCT ID LC DefList RC { $$ = new Node("StructSpecifier", "", $1->line_num, 5, $1, $2, $3, $4, $5); }
+    | STRUCT ID { $$ = new Node("StructSpecifier", "", $1->line_num, 2, $1, $2); }
     ;
 
 /* declarator */
 VarDec:
-    ID { $$ = newInternalNode("VarDec", 1, $1); }
-    | INT {
-        has_error = 1;
-        _ERROR_TYPE_A(yytext);
-        $$ = newInternalNode("VarDec", 1, $1);
-    }
-    | ERROR {
-        has_error = 1;
-        $$ = newInternalNode("VarDec", 1, $1);
-    }
-    | VarDec LB INT RB { $$ = newInternalNode("VarDec", 4, $1, $2, $3, $4); }
-    | VarDec LB TYPE RB { 
-        _INVALID_INDEX_ERROR($2);
-        $$ = newInternalNode("VarDec", 4, $1, $2, $3, $4);
-    }
+    ID { $$ = new Node("VarDec", "", $1->line_num, 1, $1); }
+    | VarDec LB INT RB { $$ = new Node("VarDec", "", $1->line_num, 4, $1, $2, $3, $4); }
     ;
 FunDec:
-    ID LP VarList RP { $$ = newInternalNode("FunDec", 4, $1, $2, $3, $4); }
-    | ID LP RP { $$ = newInternalNode("FunDec", 3, $1, $2, $3); }
-    | ID LP error {
-        $$ = newInternalNode("FunDec", 2, $1, $2);
-        _MISSING_RP_ERROR($2);
-    }
+    ID LP VarList RP { $$ = new Node("FunDec", "", $1->line_num, 4, $1, $2, $3, $4); }
+    | ID LP RP { $$ = new Node("FunDec", "", $1->line_num, 3, $1, $2, $3); }
     ;
 VarList:
-    ParamDec COMMA VarList { $$ = newInternalNode("VarList", 3, $1, $2, $3); }
-    | ParamDec { $$ = newInternalNode("VarList", 1, $1); }
+    ParamDec COMMA VarList { $$ = new Node("VarList", "", $1->line_num, 3, $1, $2, $3); }
+    | ParamDec { $$ = new Node("VarList", "", $1->line_num, 1, $1); }
     ;
 ParamDec:
-    Specifier VarDec { $$ = newInternalNode("ParamDec", 2, $1, $2); }
-    | VarDec {
-        _MISSING_Spec_ERROR($1);
-        $$ = newInternalNode("ParamDec", 1, $1);
-    }
+    Specifier VarDec { $$ = new Node("ParamDec", "", $1->line_num, 2, $1, $2); }
     ;
 
 /* statement */
 CompSt:
-    LC DefList StmtList RC { $$ = newInternalNode("CompSt", 4, $1, $2, $3, $4); }
+    LC DefList StmtList RC { $$ = new Node("CompSt", "", $1->line_num, 4, $1, $2, $3, $4); }
     ;
 StmtList:
-    Stmt StmtList { $$ = newInternalNode("StmtList", 2, $1, $2); }
-    | %empty { $$ = newInternalNode("Empty", -1); }
+    Stmt StmtList { $$ = new Node("StmtList", "", $1->line_num, 2, $1, $2); }
+    | %empty { $$ = new Node("Empty", "", yylineno, 0); }
     ;
 Stmt:
-    Exp SEMI { $$ = newInternalNode("Stmt", 2, $1, $2); }
-    | CompSt { $$ = newInternalNode("Stmt", 1, $1); }
-    | RETURN Exp SEMI { $$ = newInternalNode("Stmt", 3, $1, $2, $3); }
-    | RETURN error SEMI {
-        has_error = 1;
-        $$ = newInternalNode("Stmt", 2, $1, $3);
-    }
-    | RETURN Exp error { 
-        _MISSING_SEMI_ERROR($2);
-        $$ = newInternalNode("Stmt", 2, $1, $2); }
-    | IF LP Exp RP Stmt { $$ = newInternalNode("Stmt", 5, $1, $2, $3, $4, $5); }
-    | IF LP Exp RP Stmt ELSE Stmt { $$ = newInternalNode("Stmt", 7, $1, $2, $3, $4, $5, $6, $7); }
-    | WHILE LP Exp RP Stmt { $$ = newInternalNode("Stmt", 5, $1, $2, $3, $4, $5); }
+    Exp SEMI { $$ = new Node("Stmt", "", $1->line_num, 2, $1, $2); }
+    | CompSt { $$ = new Node("Stmt", "", $1->line_num, 1, $1); }
+    | RETURN Exp SEMI { $$ = new Node("Stmt", "", $1->line_num, 3, $1, $2, $3); }
+
+    | IF LP Exp RP Stmt { $$ = new Node("Stmt", "", $1->line_num, 5, $1, $2, $3, $4, $5); }
+    | IF LP Exp RP Stmt ELSE Stmt { $$ = new Node("Stmt", "", $1->line_num, 7, $1, $2, $3, $4, $5, $6, $7); }
+    | WHILE LP Exp RP Stmt { $$ = new Node("Stmt", "", $1->line_num, 5, $1, $2, $3, $4, $5); }
     ;
 
 /* local definition */
 DefList:
-    Def DefList { $$ = newInternalNode("DefList", 2, $1, $2); }
-    | %empty { $$ = newInternalNode("Empty", -1); }
+    Def DefList { $$ = new Node("DefList", "", $1->line_num, 2, $1, $2); }
+    | %empty { $$ = new Node("Empty", "", yylineno, 0); }
     ;
 Def:
-    Specifier DecList error { 
-        _MISSING_SEMI_ERROR($2);
-        $$ = newInternalNode("Def", 3, $1, $2);}
-    | Specifier DecList SEMI { $$ = newInternalNode("Def", 3, $1, $2, $3); }
-    | error DecList SEMI {
-        has_error = 1;
-        fprintf(fout, "Error type B at Line %d: Missing specifier \n", $$->lineno - 1);
-        $$ = newInternalNode("Def", 2, $2, $3);
-    }
-    | Specifier error SEMI {
-        has_error = 1;
-        $$ = newInternalNode("Def", 2, $1, $3);
-    }
+    Specifier DecList SEMI { $$ = new Node("Def", "", $1->line_num, 3, $1, $2, $3); }
     ;
 DecList:
-    Dec { $$ = newInternalNode("DecList", 1, $1); }
-    | Dec COMMA DecList { $$ = newInternalNode("DecList", 3, $1, $2, $3); }
+    Dec { $$ = new Node("DecList", "", $1->line_num, 1, $1); }
+    | Dec COMMA DecList { $$ = new Node("DecList", "", $1->line_num, 3, $1, $2, $3); }
     ;
 Dec:
-    VarDec { $$ = newInternalNode("Dec", 1, $1); }
-    | VarDec ASSIGN Exp { $$ = newInternalNode("Dec", 3, $1, $2, $3); }
+    VarDec { $$ = new Node("Dec", "", $1->line_num, 1, $1); }
+    | VarDec ASSIGN Exp { $$ = new Node("Dec", "", $1->line_num, 3, $1, $2, $3); }
     ;
 
 /* Expression */
 Exp:
-    Exp ASSIGN Exp { $$ = newInternalNode("Exp", 3, $1, $2, $3); }
-    | Exp AND Exp { $$ = newInternalNode("Exp", 3, $1, $2, $3); }
-    | Exp OR Exp { $$ = newInternalNode("Exp", 3, $1, $2, $3); }
-    | Exp LT Exp { $$ = newInternalNode("Exp", 3, $1, $2, $3); }
-    | Exp LE Exp { $$ = newInternalNode("Exp", 3, $1, $2, $3); }
-    | Exp GT Exp { $$ = newInternalNode("Exp", 3, $1, $2, $3); }
-    | Exp GE Exp { $$ = newInternalNode("Exp", 3, $1, $2, $3); }
-    | Exp NE Exp { $$ = newInternalNode("Exp", 3, $1, $2, $3); }
-    | Exp EQ Exp { $$ = newInternalNode("Exp", 3, $1, $2, $3); }
-    | Exp PLUS Exp { $$ = newInternalNode("Exp", 3, $1, $2, $3); }
-    | Exp MINUS Exp { $$ = newInternalNode("Exp", 3, $1, $2, $3); }
-    | Exp MUL Exp { $$ = newInternalNode("Exp", 3, $1, $2, $3); }
-    | Exp DIV Exp { $$ = newInternalNode("Exp", 3, $1, $2, $3); }
-    | LP Exp RP { $$ = newInternalNode("Exp", 3, $1, $2, $3); }
-    | MINUS Exp  { $$ = newInternalNode("Exp", 2, $1, $2); }
-    | NOT Exp  { $$ = newInternalNode("Exp", 2, $1, $2); }
-    | ID LP Args RP { $$ = newInternalNode("Exp", 4, $1, $2, $3, $4); }
-    | ID LP Args error {
-        _MISSING_RP_ERROR($1);
-        $$ = newInternalNode("Exp", 4, $1, $2, $3);
-    }
-    | ID LP RP { $$ = newInternalNode("Exp", 3, $1, $2, $3); }
-    | Exp LB Exp RB { $$ = newInternalNode("Exp", 4, $1, $2, $3, $4); }
-    | Exp DOT ID { $$ = newInternalNode("Exp", 3, $1, $2, $3); }
-    | ID  { $$ = newInternalNode("Exp", 1, $1); }
-    | INT { $$ = newInternalNode("Exp", 1, $1); }
-    | FLOAT{ $$ = newInternalNode("Exp", 1, $1); }
-    | CHAR{ $$ = newInternalNode("Exp", 1, $1); }
-    | Exp ERROR Exp {
-        has_error = 1;
-        $$ = newInternalNode("Exp", 3, $1, $2, $3);
-    }
-    | ERROR {
-        has_error = 1;
-        $$ = newInternalNode("Exp", 1, $1);
-    }
+    Exp ASSIGN Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    | Exp AND Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    | Exp OR Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    | Exp LT Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    | Exp LE Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    | Exp GT Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    | Exp GE Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    | Exp NE Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    | Exp EQ Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    | Exp PLUS Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    | Exp MINUS Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    | Exp MUL Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    | Exp DIV Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    
+    | LP Exp RP { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    | MINUS Exp  { $$ = new Node("Exp", "", $1->line_num, 2, $1, $2); }
+    | NOT Exp  { $$ = new Node("Exp", "", $1->line_num, 2, $1, $2); }
+    
+    | ID LP Args RP { $$ = new Node("Exp", "", $1->line_num, 4, $1, $2, $3, $4); }
+    | ID LP RP { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    
+    | Exp LB Exp RB { $$ = new Node("Exp", "", $1->line_num, 4, $1, $2, $3, $4); }
+    | Exp DOT ID { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    
+    | ID  { $$ = new Node("Exp", "", $1->line_num, 1, $1); }
+    | INT { $$ = new Node("Exp", "", $1->line_num, 1, $1); }
+    | FLOAT{ $$ = new Node("Exp", "", $1->line_num, 1, $1); }
+    | CHAR{ $$ = new Node("Exp", "", $1->line_num, 1, $1); }
     ;
 Args:
-    Exp COMMA Args { $$ = newInternalNode("Args", 3, $1, $2, $3); }
-    | Exp { $$ = newInternalNode("Args", 1, $1); }
+    Exp COMMA Args { $$ = new Node("Args", "", $1->line_num, 3, $1, $2, $3); }
+    | Exp { $$ = new Node("Args", "", $1->line_num, 1, $1); }
     ;
 
 %%
@@ -246,5 +197,8 @@ int main(int argc, char **argv){
         fout = fopen(tmp, "w");
     }
     yyparse();
+
+    // 假设无错误
+    fclose(fout);
     return 0;
 }
