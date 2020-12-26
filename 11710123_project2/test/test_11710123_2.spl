@@ -1,0 +1,5 @@
+// type 2
+int main(){
+    helloworld(1);
+    return 1;
+}

@@ -1,0 +1,3 @@
+Error type 15 at Line 7: redefine the same structure type
+Error type 14 at Line 17: accessing an undefined structure member
+Error type 5 at Line 17: unmatching types on both sides of assignment operator (=)

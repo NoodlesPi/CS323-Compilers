@@ -1,0 +1,11 @@
+int compare(int a){
+    return a;
+}
+float compare(int a){
+    return a;
+}
+int main(){
+    int k = 0;
+    k.a = 10;
+    return compare.m;
+}

@@ -1,0 +1,14 @@
+/*
+用来测试nest定义的变量
+*/
+struct A {
+    int b = 10;
+};
+struct C {
+    int d = 10;
+};
+int main(){
+    struct A a;
+    struct C c;
+    a = c;
+}

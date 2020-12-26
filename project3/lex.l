@@ -7,7 +7,8 @@
         return name; \
     }
 
-    extern FILE* fout;
+    #define YY_DECL extern "C" int yylex()
+
 %}
 %option yylineno
 
@@ -33,6 +34,8 @@ multi_line_comment \/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/
 "else" _NEW_NODE(ELSE, "")
 "while" _NEW_NODE(WHILE, "")
 "return" _NEW_NODE(RETURN, "")
+"read" _NEW_NODE(READ, "")
+"write" _NEW_NODE(WRITE, "")
 "." _NEW_NODE(DOT, "")
 ";" _NEW_NODE(SEMI, "")
 "," _NEW_NODE(COMMA, "")

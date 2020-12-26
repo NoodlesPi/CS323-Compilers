@@ -1,0 +1,16 @@
+struct position{
+    int x;
+    int y;
+    int z;
+};
+
+int main(){
+    int a[5][10][20];
+    struct position p;
+    p.x = 5;
+    p.y = 6;
+    p.z = 7;
+    // type 5
+    p.z = 'a';
+    return a[p.x][p.y][p.z];
+}

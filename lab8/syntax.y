@@ -5,42 +5,49 @@
 
     bool is_valid = true;  // use this value
 %}
+%union{
+    class JsonObject* JsonObject;
+    class ObjectMember* ObjectMember;
+}
+
 
 %token LC RC LB RB COLON COMMA
-%token STRING NUMBER
-%token TRUE FALSE VNULL
+%token<JsonObject> STRING NUMBER
+%token<JsonObject> TRUE FALSE VNULL
+%type <JsonObject> Json Value Object Array Values;
+%type <ObjectMember> Member Members;
 %%
 
 Json:
-      Value
+      Value{if(!checkValue($1)){is_valid = false;}}
     ;
 Value:
-      Object
-    | Array
-    | STRING
-    | NUMBER
-    | TRUE
-    | FALSE
-    | VNULL
+      Object {$$ = $1;}
+    | Array {$$ = $1;}
+    | STRING {$$ = $1;}
+    | NUMBER {$$ = $1;}
+    | TRUE {$$ = $1;}
+    | FALSE {$$ = $1;}
+    | VNULL {$$ = $1;}
     ;
 Object:
-      LC RC
-    | LC Members RC
+      LC RC {$$ = NewNull();}
+    | LC Members RC{$$ = NewObjectFromMember($2);}
     ;
 Members:
-      Member
-    | Member COMMA Members
+      Member {$$ = $1;}
+    | Member COMMA Members {$$ = AddMemberItem($1, $3);}
     ;
 Member:
-      STRING COLON Value
+      STRING COLON Value {$$ = NewMember($1, $3);}
     ;
 Array:
-      LB RB
-    | LB Values RB
+      LB RB {$$ = NewArray(NewNull());}
+    | LB Values RB {$$ = $2;}
     ;
 Values:
-      Value
-    | Value COMMA Values
+      Value {$$ = NewArray($1);}
+    | Value COMMA Values {$$ = AddArrayItem($1, $3);}
     ;
 %%
 

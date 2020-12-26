@@ -1,0 +1,7 @@
+Error type 8 at Line 6: the function’s return value type mismatches the declared type
+Error type 7 at Line 13: unmatching operands, such as adding an integer to a structure variable
+Error type 8 at Line 13: the function’s return value type mismatches the declared type
+Error type 4 at Line 12: function is redefined
+Error type 9 at Line 16: the function’s arguments mismatch the declared parameters
+Error type 9 at Line 16: the function’s arguments mismatch the declared parameters
+Error type 8 at Line 17: the function’s return value type mismatches the declared type

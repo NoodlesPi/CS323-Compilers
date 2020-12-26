@@ -1,0 +1,6 @@
+// type 1 and type 5
+int main(){
+    int a = 10;
+    a = b;
+    return 0;
+}

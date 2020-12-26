@@ -1,8 +1,5 @@
 #include "semantic.hpp"
 
-multimap<string, Variable *> var_map;
-multimap<string, Structure *> strc_map;
-
 int global_scope_level;
 
 Type *EMPTY_TYPE;
@@ -68,7 +65,7 @@ Exp:
     | CHAR{ $$ = new Node("Exp", "", $1->line_num, 1, $1); }
     ;
 */
-Type* handle_Exp(Node *node, bool single=false){
+Type* handle_Exp(Node *node, bool single){
     /*
     | ID LP Args RP { $$ = new Node("Exp", "", $1->line_num, 4, $1, $2, $3, $4); }
     | ID LP RP { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
@@ -200,6 +197,12 @@ DecList:
 vector<Variable *> handle_DecList(Node *node, Type *type){
     vector<Variable *> l = vector<Variable *>();
     l.push_back(handle_Dec(node->child_list[0], type));
+    Node *tmp = node;
+    while(tmp->child_num > 1){
+        tmp = tmp->child_list[2];
+        l.push_back(handle_Dec(tmp->child_list[0], type));
+    }
+    return l;
 }
 /*
 Def:
@@ -207,8 +210,7 @@ Def:
     ;
 */
 vector<Variable *> handle_Def(Node *node){
-    Type *type = handle_Specifier(node->child_list[0]);
-    
+    return handle_DecList(node->child_list[1], handle_Specifier(node->child_list[0]));
 }
 /*
 DefList:
@@ -221,7 +223,10 @@ vector<Variable *> handle_DefList(Node *node){
     Node *tmp = node;
     while(tmp->child_num){
         auto def = handle_Def(tmp->child_list[0]);
+        l.insert(l.end(), def.begin(), def.end());
+        tmp = tmp->child_list[1];
     }
+    return l;
 }
 /*
 StructSpecifier:
@@ -232,10 +237,9 @@ StructSpecifier:
 Type *handle_StructSpecifier(Node *node){
     string name = node->value;
     if(node->child_num > 3){
-        Structure *struc = new Structure(name, handle_DefList(node->child_list[3]))
-    }else{
-
+        return new Structure(name, handle_DefList(node->child_list[3]));
     }
+    return strc_map.find(name)->second;
 }
 /*
 Specifier:
@@ -251,6 +255,115 @@ Type *handle_Specifier(Node *node){
 }
 
 /*
+ExtDecList:
+    VarDec { $$ = new Node("ExtDecList", "", $1->line_num, 1, $1); }
+    | VarDec COMMA ExtDecList { $$ = new Node("ExtDecList", "", $1->line_num, 3, $1, $2, $3); }
+    ;
+*/
+void handle_ExtDecList(Node *node, Type *type){
+    handle_VarDec(node->child_list[0], type);
+    Node *tmp = node;
+    while(tmp->child_num > 1){
+        tmp = tmp->child_list[2];
+        handle_VarDec(node->child_list[0], type);
+    }
+}
+
+/*
+ParamDec:
+    Specifier VarDec { $$ = new Node("ParamDec", "", $1->line_num, 2, $1, $2); }
+    ;
+*/
+Variable* handle_ParamDec(Node *node){
+    return handle_VarDec(node->child_list[1], handle_Specifier(node->child_list[0]));
+}
+
+/*
+Stmt:
+    Exp SEMI { $$ = new Node("Stmt", "", $1->line_num, 2, $1, $2); }
+    | CompSt { $$ = new Node("Stmt", "", $1->line_num, 1, $1); }
+    | RETURN Exp SEMI { $$ = new Node("Stmt", "", $1->line_num, 3, $1, $2, $3); }
+
+    | IF LP Exp RP Stmt { $$ = new Node("Stmt", "", $1->line_num, 5, $1, $2, $3, $4, $5); }
+    | IF LP Exp RP Stmt ELSE Stmt { $$ = new Node("Stmt", "", $1->line_num, 7, $1, $2, $3, $4, $5, $6, $7); }
+    | WHILE LP Exp RP Stmt { $$ = new Node("Stmt", "", $1->line_num, 5, $1, $2, $3, $4, $5); }
+    ;
+*/
+void handle_Stmt(Node *node, Type *type){
+    if(node->child_list[0]->token == "CompSt"){
+        handle_CompSt(node->child_list[0], type);
+    }else if(node->child_list[0]->token == "Exp"){
+        handle_Exp(node->child_list[0]);
+    }else if(node->child_list[0]->token == "RETURN"){
+        Type *return_type = handle_Exp(node->child_list[1], true);
+    }else if(node->child_list[0]->token == "IF"){
+        handle_Exp(node->child_list[2]);
+        handle_Stmt(node->child_list[4], type);
+        if(node->child_num > 5){
+            handle_Stmt(node->child_list[6], type);
+        }
+    }else if(node->child_list[0]->token == "WHILE"){
+        handle_Exp(node->child_list[2]);
+        handle_Stmt(node->child_list[4], type);
+    }
+}
+/*
+StmtList:
+    Stmt StmtList { $$ = new Node("StmtList", "", $1->line_num, 2, $1, $2); }
+    | %empty { $$ = new Node("Empty", "", yylineno, 0); }
+    ;
+*/
+void handle_StmtList(Node *node, Type *type){
+    Node *tmp = node;
+    while(tmp->child_num){
+        handle_Stmt(tmp->child_list[0], type);
+        tmp = tmp->child_list[1];
+    }
+}
+
+
+/*
+CompSt:
+    LC DefList StmtList RC { $$ = new Node("CompSt", "", $1->line_num, 4, $1, $2, $3, $4); }
+    ;
+*/
+void handle_CompSt(Node *node, Type *type){
+    handle_DefList(node->child_list[1]);
+    handle_StmtList(node->child_list[2], type);
+}
+/*
+VarList:
+    ParamDec COMMA VarList { $$ = new Node("VarList", "", $1->line_num, 3, $1, $2, $3); }
+    | ParamDec { $$ = new Node("VarList", "", $1->line_num, 1, $1); }
+    ;
+*/
+vector<Variable *> handle_VarList(Node *node){
+    vector<Variable *> l = vector<Variable *>();
+    l.push_back(handle_ParamDec(node->child_list[0]));
+    Node *tmp = node;
+    while(tmp->child_num > 1){
+        tmp = tmp->child_list[2];
+        l.push_back(handle_ParamDec(tmp->child_list[0]));
+    }
+    return l;
+}
+
+/*
+FunDec:
+    ID LP VarList RP { $$ = new Node("FunDec", "", $1->line_num, 4, $1, $2, $3, $4); }
+    | ID LP RP { $$ = new Node("FunDec", "", $1->line_num, 3, $1, $2, $3); }
+    ;
+*/
+Variable* handle_FunDec(Node *node, Type *type){
+    string name = node->value;
+    vector<Variable *> args = vector<Variable *>();
+    if(node->child_list[2]->token == "VarList"){
+        args = handle_VarList(node->child_list[2]);
+    }
+
+    return new Variable(name, type, args, 1, global_scope_level - 1, node->line_num);
+}
+/*
 ExtDef:
     Specifier ExtDecList SEMI { $$ = new Node("ExtDef", "", $1->line_num, 3, $1, $2, $3); }
     | Specifier SEMI { $$ = new Node("ExtDef", "", $1->line_num, 2, $1, $2); }
@@ -259,7 +372,15 @@ ExtDef:
 */
 void handle_ExtDef(Node *node){
     // return type int, float, char or struct
-    Type *t = handle_Specifier(node->child_list[0]);
+    Type *type = handle_Specifier(node->child_list[0]);
+    vector<Variable *> l = vector<Variable *>();
+    if(node->child_list[1]->token == "ExtDecList"){
+        handle_ExtDecList(node->child_list[1], type);
+    }
+    if(node->child_list[1]->token == "FunDec"){
+        Variable *fundec = handle_FunDec(node->child_list[1], type);
+        handle_CompSt(node->child_list[2], type);
+    }
 }
 /*
 ExtDefList:

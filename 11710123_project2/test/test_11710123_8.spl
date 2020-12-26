@@ -1,0 +1,13 @@
+struct apple{
+    int value;
+    char p;
+};
+int helloworld(){
+    struct apple a;
+    return a.value;
+}
+
+int main(){
+    float f = helloworld();
+    return helloworld(1);
+}

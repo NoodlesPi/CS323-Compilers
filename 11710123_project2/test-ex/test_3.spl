@@ -1,0 +1,14 @@
+// revoke Assumption 5
+// 预期应该不会有错误信息
+
+struct A {
+    int a = 10;
+};
+struct B {
+    int a = 10;
+};
+int main(){
+    struct A testA;
+    struct B testB;
+    testA.a = testB.a;
+}

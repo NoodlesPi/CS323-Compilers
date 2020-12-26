@@ -1,0 +1,4 @@
+Error type 4 at Line 4: function is redefined
+Error type 10 at Line 10: applying indexing operator ([...]) on non-array type variables
+Error type 5 at Line 10: unmatching type
+Error type 2 at Line 12: function is invoked without definition

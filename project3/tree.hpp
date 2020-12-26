@@ -3,7 +3,7 @@
 using namespace std;
 
 extern char *yytext;
-FILE *fout;
+extern FILE *fout;
 
 class Node {
     public:

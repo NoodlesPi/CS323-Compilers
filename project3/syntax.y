@@ -35,7 +35,8 @@
 %token <node> INT FLOAT CHAR 
 %token <node> ID TYPE STRUCT IF ELSE WHILE RETURN
 %token <node> DOT SEMI COMMA ASSIGN LT LE GT GE NE EQ 
-%token <node> PLUS MINUS MUL DIV AND OR NOT LP RP LB RB LC RC ERROR
+%token <node> PLUS MINUS MUL DIV AND OR NOT LP RP LB RB LC RC
+%token <node> WRITE READ
 
 %type <node> Program ExtDefList ExtDef ExtDecList;
 %type <node> Specifier StructSpecifier;
@@ -120,6 +121,8 @@ Stmt:
     | IF LP Exp RP Stmt { $$ = new Node("Stmt", "", $1->line_num, 5, $1, $2, $3, $4, $5); }
     | IF LP Exp RP Stmt ELSE Stmt { $$ = new Node("Stmt", "", $1->line_num, 7, $1, $2, $3, $4, $5, $6, $7); }
     | WHILE LP Exp RP Stmt { $$ = new Node("Stmt", "", $1->line_num, 5, $1, $2, $3, $4, $5); }
+
+    | WRITE LP Args RP SEMI { $$ = new Node("Stmt", "", $1->line_num, 5, $1, $2, $3, $4, $5); }
     ;
 
 /* local definition */
@@ -169,6 +172,7 @@ Exp:
     | INT { $$ = new Node("Exp", "", $1->line_num, 1, $1); }
     | FLOAT{ $$ = new Node("Exp", "", $1->line_num, 1, $1); }
     | CHAR{ $$ = new Node("Exp", "", $1->line_num, 1, $1); }
+    | READ LP RP { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
     ;
 Args:
     Exp COMMA Args { $$ = new Node("Args", "", $1->line_num, 3, $1, $2, $3); }
@@ -177,9 +181,9 @@ Args:
 
 %%
 
-/* void yyerror(const char *s){
+void yyerror(const char *s){
     printf("syntax error: %s\n", s);
-} */
+} 
 
 int main(int argc, char **argv){
     if(argc != 2) {
@@ -199,6 +203,7 @@ int main(int argc, char **argv){
     yyparse();
 
     // 假设无错误
+    root->print_tree(0);
     fclose(fout);
     return 0;
 }

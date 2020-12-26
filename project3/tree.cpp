@@ -23,7 +23,6 @@ Node::Node(string token, string value, int line_num, int child_num, ...){
         this->child_list.push_back(va_arg(args, Node *));
     }
     va_end(args);
-    fprintf(fout, "hello");
 }
 
 // 以该节点为root打印语法树
@@ -53,11 +52,4 @@ void print_indent(int indent){
         blank += " ";
     }
     fprintf(fout, "%s", blank.c_str());
-}
-
-int main() {
-    char *test = "aaaa";
-    Node *n = new Node("",test,1,1);
-    cout << n->value << endl;
-    return 0;
 }

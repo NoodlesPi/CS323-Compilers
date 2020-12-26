@@ -1,0 +1,2 @@
+Error type 1 at Line 4: variable is used without definition
+Error type 5 at Line 4: unmatching types on both sides of assignment operator (=)

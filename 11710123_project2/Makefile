@@ -1,11 +1,8 @@
 CC=g++
 FLEX=flex
 YACC=bison
-
-splc: clean
+splc:
 	@mkdir bin
-	touch bin/splc
-	@chmod +x bin/splc
 	$(YACC) -t -d syntax.y
 	$(FLEX) lex.l
 	$(CC) -lfl -ly tree.cpp semantic.cpp syntax.tab.c -o ./bin/splc

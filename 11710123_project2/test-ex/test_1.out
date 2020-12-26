@@ -1,0 +1,2 @@
+Error type 1 at Line 5: variable is used without definition
+Error type 8 at Line 5: the function’s return value type mismatches the declared type

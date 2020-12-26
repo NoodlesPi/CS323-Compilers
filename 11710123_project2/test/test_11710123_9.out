@@ -1,0 +1,5 @@
+Error type 8 at Line 5: the function’s return value type mismatches the declared type
+Error type 4 at Line 4: function is redefined
+Error type 9 at Line 9: the function’s arguments mismatch the declared parameters
+Error type 13 at Line 9: accessing member of non-structure variable
+Error type 8 at Line 9: the function’s return value type mismatches the declared type

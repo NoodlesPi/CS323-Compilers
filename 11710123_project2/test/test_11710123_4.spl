@@ -1,0 +1,19 @@
+int helloworld(int a){
+    return a;
+}
+// type 8
+int helloworld(float b){
+    return b;
+}
+int helloworld(int c, int d){
+    return (c + d)/2;
+}
+// type 7 and type 4
+int helloworld(int a){
+    return a / 'c';
+}
+int main(){
+    // type 9
+    helloworld(helloworld(1), helloworld(2), helloworld(helloworld(1), helloworld(2)), helloworld(helloworld(1), helloworld(2), helloworld(3)));
+    return 1.2;
+}

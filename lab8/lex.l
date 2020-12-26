@@ -1,5 +1,11 @@
 %{
+
     #include"syntax.tab.h"
+    #include "JSONType.h"
+    void yyerror(const char* s){}
+    
+
+    #define YY_DECL extern "C" int yylex()
 %}
 %option noyywrap
 
@@ -24,11 +30,11 @@ empty [ \n\r\t]
 ":" { return COLON; }
 "," { return COMMA; }
 
-"true" { return TRUE; }
-"false" { return FALSE; }
-"null" { return VNULL; }
+"true" { yylval.JsonObject= NewBoolean(1); return TRUE; }
+"false" { yylval.JsonObject = NewBoolean(0);return FALSE; }
+"null" { yylval.JsonObject = NewNull();return VNULL; }
+{string} { yylval.JsonObject = NewString(yytext); return STRING; }
+{number} { yylval.JsonObject = NewNumber(yytext); return NUMBER; }
 
-{string} { return STRING; }
-{number} { return NUMBER; }
 
 {empty} {}

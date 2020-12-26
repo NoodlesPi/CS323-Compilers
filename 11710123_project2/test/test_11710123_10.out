@@ -1,0 +1,7 @@
+Error type 7 at Line 8: unmatching operands, such as adding an integer to a structure variable
+Error type 13 at Line 8: accessing member of non-structure variable
+Error type 7 at Line 8: unmatching operands, such as adding an integer to a structure variable
+Error type 8 at Line 8: the function’s return value type mismatches the declared type
+Error type 7 at Line 16: unmatching operands, such as adding an integer to a structure variable
+Error type 5 at Line 16: unmatching types on both sides of assignment operator (=)
+Error type 5 at Line 17: unmatching types on both sides of assignment operator (=)

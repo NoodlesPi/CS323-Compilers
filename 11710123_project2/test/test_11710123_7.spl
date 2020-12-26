@@ -1,0 +1,14 @@
+int apple(int a){
+    return a;
+}
+float apple(int b){
+    return 1.0;
+}
+int main(){
+    int appla[10];
+    // type 10
+    int app = appla[10][5];
+    // type 2
+    peach(5);
+    return 1;
+}

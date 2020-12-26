@@ -1,0 +1,18 @@
+struct a{
+    int b = 10000;
+    int c = 0;
+
+};
+// type 15
+struct a{
+    int b = 10;
+    int c = 1;
+
+};
+int main(){
+    struct a app;
+    app.b = 8000;
+    app.c = app.b;
+    // type 13
+    app.d = 1000;
+}
