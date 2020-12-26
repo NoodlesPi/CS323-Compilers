@@ -12,7 +12,7 @@
 %}
 %option yylineno
 
-number [-+]?[1-9][0-9]*|0
+number [1-9][0-9]*|0
 type int|float|char
 
 id [a-zA-Z_][0-9a-zA-Z_]{0,31}
@@ -36,23 +36,23 @@ multi_line_comment \/\*([^*]|[\r\n]|(\*+([^*\/]|[\r\n])))*\*+\/
 "return" _NEW_NODE(RETURN, "")
 "read" _NEW_NODE(READ, "")
 "write" _NEW_NODE(WRITE, "")
-"." _NEW_NODE(DOT, "")
-";" _NEW_NODE(SEMI, "")
-"," _NEW_NODE(COMMA, "")
-"=" _NEW_NODE(ASSIGN, "")
-"<" _NEW_NODE(LT, "")
-"<=" _NEW_NODE(LE, "")
-">" _NEW_NODE(GT, "")
-">=" _NEW_NODE(GE, "")
-"!=" _NEW_NODE(NE, "")
-"==" _NEW_NODE(EQ, "")
-"+" _NEW_NODE(PLUS, "")
-"-" _NEW_NODE(MINUS, "")
-"*" _NEW_NODE(MUL, "")
-"/" _NEW_NODE(DIV, "")
-"&&" _NEW_NODE(AND, "")
-"||" _NEW_NODE(OR, "")
-"!" _NEW_NODE(NOT, "")
+"." _NEW_NODE(DOT, ".")
+";" _NEW_NODE(SEMI, ";")
+"," _NEW_NODE(COMMA, ",")
+"=" _NEW_NODE(ASSIGN, "=")
+"<" _NEW_NODE(LT, "<")
+"<=" _NEW_NODE(LE, "<=")
+">" _NEW_NODE(GT, ">")
+">=" _NEW_NODE(GE, ">=")
+"!=" _NEW_NODE(NE, "!=")
+"==" _NEW_NODE(EQ, "==")
+"+" _NEW_NODE(PLUS, "+")
+"-" _NEW_NODE(MINUS, "-")
+"*" _NEW_NODE(MUL, "*")
+"/" _NEW_NODE(DIV, "/")
+"&&" _NEW_NODE(AND, "&&")
+"||" _NEW_NODE(OR, "||")
+"!" _NEW_NODE(NOT, "!")
 "(" _NEW_NODE(LP, "")
 ")" _NEW_NODE(RP, "")
 "[" _NEW_NODE(LB, "")

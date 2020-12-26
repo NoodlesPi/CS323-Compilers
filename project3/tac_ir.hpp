@@ -91,6 +91,15 @@ DecCode::DecCode(int addr, Type *type, string name, vector<int> sizes){
         tmp *= sizes[i];
     }
 }
+string DecCode::to_instruction(){
+    char instruction[len];
+    int size = 1;
+    for (auto s: sizes){
+        size *= s;
+    }
+    sprintf(instruction, "DEC t%d %d", TAC::addr, type_size * size);
+    return instruction;    
+}
 
 class AssignCode: public TAC{
     public:
@@ -191,6 +200,11 @@ ArithCode::ArithCode(int addr, int laddr, int raddr, string token){
     this->raddr = raddr;
     TAC::addr = addr;
 }
+string ArithCode::to_instruction(){
+    char instruction[len];
+    sprintf(instruction, "t%d := %s %s %s", TAC::addr, TAC::addr_to_string(laddr).c_str(), token.c_str(), TAC::addr_to_string(raddr).c_str());
+    return instruction;    
+}
 
 class ReadCode: public TAC{
     public:
@@ -269,6 +283,35 @@ string WriteCode::to_instruction(){
     sprintf(instruction, "WRITE t%d", raddr);
     return instruction;      
 }
+
+class ArgCode: public TAC{
+    public:
+        int raddr;
+        ArgCode(int, int);
+        string to_instruction();
+};
+ArgCode::ArgCode(int addr, int raddr){
+    this->raddr = raddr;
+    TAC::addr = addr;
+}
+string ArgCode::to_instruction(){
+    char instruction[len];
+    sprintf(instruction, "ARG t%d", raddr);
+    return instruction;     
+}
+
+class CallCode: public TAC{
+public:
+    string name;
+    string to_string(){
+        char ss[len];
+        sprintf(ss, "t%d := CALL %s", TAC::addr, name.c_str());
+        return ss;
+    }
+    CallCode(int addr, string name):name(name){
+        TAC::addr = addr;
+    }
+};
 
 vector<TAC *> tac_list;
 map<string, int> name_to_addr;

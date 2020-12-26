@@ -6,10 +6,10 @@ splc: clean
 	@mkdir bin
 	touch bin/splc
 	@chmod +x bin/splc
-	$(YACC) -t -d syntax.y
 	$(FLEX) lex.l
-	$(CC) -lfl -ly tree.cpp semantic.cpp syntax.tab.c -o ./bin/splc
+	$(YACC) -t -d syntax.y
+	$(CC) -lfl -ly tree.cpp tac_ir.cpp syntax.tab.c -o ./bin/splc
 clean:
 	@rm -rf bin/
-	@rm -f test/*.out test-ex/*.out
+	@rm -f test/*.out test-ex/*.out sample/*.out
 	@rm -f lex.yy.* syntax.tab.* syntax.output

@@ -4,28 +4,8 @@
     FILE *fout = NULL;
     Node *root;
 
-    #define _MISSING_SEMI_ERROR(e) { \
-        has_error = 1; \
-        fprintf(fout, "Error type B at Line %d: Missing semicolon ';'\n", e->lineno); \
-    }
-
-    #define _MISSING_RP_ERROR(e) { \
-        has_error = 1; \
-        fprintf(fout, "Error type B at Line %d: Missing closing parenthesis ')'\n", e->lineno); \
-    }
-
-    #define _MISSING_Spec_ERROR(e) { \
-        has_error = 1; \
-        fprintf(fout, "Error type B at Line %d: Missing specifier \n", e->lineno); \
-    }
-
-    #define _INVALID_INDEX_ERROR(e) { \
-        has_error = 1; \
-        fprintf(fout, "Error type B at Line %d: Invalid index \n", e->lineno); \
-    }
-    short has_error = 0;
-
     void yyerror(const char*);
+    extern void translate_Programe(Node *root);
 %}
 
 %union {
@@ -182,7 +162,7 @@ Args:
 %%
 
 void yyerror(const char *s){
-    printf("syntax error: %s\n", s);
+    printf("syntax error: %s yytext:%s lineno:%d\n", s, yytext, yylineno);
 } 
 
 int main(int argc, char **argv){
@@ -204,6 +184,7 @@ int main(int argc, char **argv){
 
     // 假设无错误
     root->print_tree(0);
+    translate_Programe(root);
     fclose(fout);
     return 0;
 }

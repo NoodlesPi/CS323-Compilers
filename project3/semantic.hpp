@@ -1,7 +1,7 @@
 #include "tree.hpp"
 
 using namespace std;
-int type_size;
+extern const int type_size;
 
 class Type{
     public:
