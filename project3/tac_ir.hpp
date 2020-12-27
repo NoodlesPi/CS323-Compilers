@@ -55,6 +55,7 @@ class ParamCode: public TAC{
         vector<int> suffix;
         vector<int> sizes;
         ParamCode(int, Type *, vector<int>);
+        string to_instruction();
 };
 ParamCode::ParamCode(int addr, Type *type, vector<int> sizes){
     TAC::type = type;
@@ -68,6 +69,11 @@ ParamCode::ParamCode(int addr, Type *type, vector<int> sizes){
         suffix.push_back(tmp);
         tmp *= sizes[i];
     }
+}
+string ParamCode::to_instruction(){
+    char instruction[len];
+    sprintf(instruction, "PARAM t%d", TAC::addr);
+    return instruction;
 }
 
 class DecCode: public TAC{
@@ -303,7 +309,7 @@ string ArgCode::to_instruction(){
 class CallCode: public TAC{
 public:
     string name;
-    string to_string(){
+    string to_instruction(){
         char ss[len];
         sprintf(ss, "t%d := CALL %s", TAC::addr, name.c_str());
         return ss;

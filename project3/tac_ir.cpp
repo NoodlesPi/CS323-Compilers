@@ -157,6 +157,9 @@ int translate_Exp(Node *node, bool single){
     // | ID  { $$ = new Node("Exp", "", $1->line_num, 1, $1); }
     if(node->child_list[0]->token == "ID"){
         int addr = name_to_addr[node->child_list[0]->value];
+        if(node->child_list[0]->value == "result") {
+            cout << "result:" << addr << endl;
+        }
         if(single){
             if(!addr){
                addr = tac_list.size();
@@ -176,7 +179,6 @@ int translate_Exp(Node *node, bool single){
     if(node->child_list[1]->token == "ASSIGN"){
         int r = translate_Exp(node->child_list[2]);
         int l = translate_Exp(node->child_list[0], true);
-        cout << r << " " << l << endl;
         if(typeid(*tac_list[l])==typeid(AssignCode)){
             dynamic_cast<AssignCode *>(tac_list[l])->raddr = r;
         }else{
@@ -312,7 +314,7 @@ int translate_Exp(Node *node, bool single){
                 exp_list.pop_back();
 
                 int offset = translate_Exp(tmp1->child_list[2]);
-                tac_list.push_back(new ArithCode(tac_list.size(), offset, -(*suffix)[_index] * type_size, "-"));
+                tac_list.push_back(new ArithCode(tac_list.size(), offset, -(*suffix)[_index] * type_size, "*"));
                 offset = tac_list.size() - 1;
 
                 tac_list.push_back(new ArithCode(tac_list.size(), head, offset, "+"));
@@ -381,6 +383,11 @@ StructSpecifier:
 */
 Type* translate_StructSpecifier(Node *node){
     print_log("call translate_StructSpecifier", node);
+    string name = node->child_list[1]->value;
+    auto it = strc_map.find(name);
+    if(it == strc_map.end()){
+        strc_map.insert(make_pair(name,new Structure(name, handle_DefList(node->child_list[3]), 0, node->line_num)));
+    }
     return strc_map.find(node->child_list[1]->value)->second;
 }
 
@@ -513,8 +520,6 @@ void translate_Dec(Node *node, Type *type){
         dynamic_cast<AssignCode *>(tac)->raddr = addr;
     }
     name_to_addr[tac->name] = tac_list.size();
-    cout << "name:" << tac->name << " addr:" << tac_list.size() << endl;
-    cout << tac->to_instruction() << endl;
     tac_list.push_back(tac);// 第二个
 }// check
 
@@ -530,7 +535,7 @@ void translate_DecList(Node *node, Type *type){
     Node *tmp = node;
     while(tmp->child_num > 1){
         tmp = tmp->child_list[2];
-        translate_Dec(node->child_list[0], type);
+        translate_Dec(tmp->child_list[0], type);
     }
 }// check
 

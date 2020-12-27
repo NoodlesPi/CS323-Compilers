@@ -138,7 +138,7 @@ Exp:
     | Exp MUL Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
     | Exp DIV Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
     
-    | LP Exp RP { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    | LP Exp RP { $$ = $2; }
     | MINUS Exp  { $$ = new Node("Exp", "", $1->line_num, 2, $1, $2); }
     | NOT Exp  { $$ = new Node("Exp", "", $1->line_num, 2, $1, $2); }
     

@@ -1,3 +1,6 @@
+#ifndef _SEMANTIC_H
+#define _SEMANTIC_H
+
 #include "tree.hpp"
 
 using namespace std;
@@ -75,6 +78,9 @@ class Structure: public Type{
         Structure(string, vector<Variable *>, int, int);
         int get_offset(string);
         int get_size();
+        bool operator==(const Type &other) const{
+        return (typeid(*this)==typeid(other)) && (name.compare(dynamic_cast<const Structure &>(other).name)==0);
+        }
 };
 Structure::Structure(string name, vector<Variable *> fields = {}, int scope_level=0, int line_num=1){
     this->name = name;
@@ -130,3 +136,5 @@ void handle_Program(Node *root);
 
 multimap<string, Variable *> var_map;
 multimap<string, Structure *> strc_map;
+
+#endif
