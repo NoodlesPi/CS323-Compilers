@@ -3,3 +3,19 @@ make
 ./bin/splc ./sample/test02.spl
 ./bin/splc ./sample/test03.spl
 ./bin/splc ./sample/test04.spl
+
+./bin/splc ./test/test_3_r01.spl
+./bin/splc ./test/test_3_r02.spl
+./bin/splc ./test/test_3_r03.spl
+./bin/splc ./test/test_3_r04.spl
+./bin/splc ./test/test_3_r05.spl
+./bin/splc ./test/test_3_r06.spl
+./bin/splc ./test/test_3_r07.spl
+./bin/splc ./test/test_3_r08.spl
+./bin/splc ./test/test_3_r09.spl
+./bin/splc ./test/test_3_r10.spl
+
+./bin/splc ./extra/test_3_b01.spl
+./bin/splc ./extra/test_3_b02.spl
+./bin/splc ./extra/test_3_b03.spl
+./bin/splc ./extra/test_3_b04.spl

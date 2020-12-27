@@ -3,7 +3,7 @@
 #define RIGHT    cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << endl;
 
 // init all relative global variables
-void init(){
+void init_all(){
     tac_list = vector<TAC *>();
     name_to_addr = map<string, int>();
     con_addr = vector<int>();
@@ -62,7 +62,7 @@ Program:
 */
 void translate_Programe(Node *root){
     print_log("call translate_Program", root);
-    init();
+    init_all();
     translate_ExtDefList(root->child_list[0]);
 
     for (int i = 1; i < tac_list.size(); ++i){
@@ -112,17 +112,6 @@ int translate_Exp(Node *node, bool single){
         return addr;
     }
 
-    /*
-    | INT { $$ = new Node("Exp", "", $1->line_num, 1, $1); }
-    | FLOAT{ $$ = new Node("Exp", "", $1->line_num, 1, $1); }
-    | CHAR{ $$ = new Node("Exp", "", $1->line_num, 1, $1); }
-    */
-    if(node->child_list[0]->token == "INT" || node->child_list[0]->token == "FLOAT" || node->child_list[0]->token == "CHAR"){
-        int addr = tac_list.size();
-        tac_list.push_back(new AssignCode(addr, -atoi(node->child_list[0]->value.c_str()), ""));
-        return addr;
-    }
-
     // | MINUS Exp  { $$ = new Node("Exp", "", $1->line_num, 2, $1, $2); }
     if(node->child_list[0]->token == "MINUS"){
         int raddr = translate_Exp(node->child_list[1]);
@@ -136,6 +125,17 @@ int translate_Exp(Node *node, bool single){
         int raddr = translate_Exp(node->child_list[1]);
         tac_list[raddr]->is_swap ^= true;
         return raddr;
+    }
+
+    /*
+    | INT { $$ = new Node("Exp", "", $1->line_num, 1, $1); }
+    | FLOAT{ $$ = new Node("Exp", "", $1->line_num, 1, $1); }
+    | CHAR{ $$ = new Node("Exp", "", $1->line_num, 1, $1); }
+    */
+    if(node->child_list[0]->token == "INT" || node->child_list[0]->token == "FLOAT" || node->child_list[0]->token == "CHAR"){
+        int addr = tac_list.size();
+        tac_list.push_back(new AssignCode(addr, -atoi(node->child_list[0]->value.c_str()), ""));
+        return addr;
     }
 
     /*
@@ -173,6 +173,11 @@ int translate_Exp(Node *node, bool single){
         }
         return addr;
         
+    }
+
+    // | LP Exp RP { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
+    if(node->child_list[0]->token == "LP"){
+        return translate_Exp(node->child_list[1]);
     }
 
     // Exp ASSIGN Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
@@ -388,7 +393,7 @@ Type* translate_StructSpecifier(Node *node){
     if(it == strc_map.end()){
         strc_map.insert(make_pair(name,new Structure(name, handle_DefList(node->child_list[3]), 0, node->line_num)));
     }
-    return strc_map.find(node->child_list[1]->value)->second;
+    return strc_map.find(name)->second;
 }
 
 /*

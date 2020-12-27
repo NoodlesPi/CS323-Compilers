@@ -138,7 +138,7 @@ Exp:
     | Exp MUL Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
     | Exp DIV Exp { $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
     
-    | LP Exp RP { $$ = $2; }
+    | LP Exp RP { $$ = $$ = new Node("Exp", "", $1->line_num, 3, $1, $2, $3); }
     | MINUS Exp  { $$ = new Node("Exp", "", $1->line_num, 2, $1, $2); }
     | NOT Exp  { $$ = new Node("Exp", "", $1->line_num, 2, $1, $2); }
     
@@ -183,7 +183,7 @@ int main(int argc, char **argv){
     yyparse();
 
     // 假设无错误
-    root->print_tree(0);
+    //root->print_tree(0);
     translate_Programe(root);
     fclose(fout);
     return 0;

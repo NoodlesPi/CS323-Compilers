@@ -1,6 +1,3 @@
-#ifndef _SEMANTIC_H
-#define _SEMANTIC_H
-
 #include "tree.hpp"
 
 using namespace std;
@@ -14,22 +11,16 @@ class Type{
         virtual bool operator == (const Type &other) const {
             return (typeid(*this)==typeid(other));
         }
+        virtual int get_size(){
+            return type_size;
+        }
 };
-Type::Type(int scope_level=0, int line_num=1){
-    this->scope_level = scope_level;
-    this->line_num = line_num;
-}
 
 class Primitive: public Type{
     public:
         string token;
-        Primitive(string, int, int);
+        Primitive(string, int = 0, int = 1);
 };
-Primitive::Primitive(string token, int scope_level=0, int line_num=1){
-    this->token = token;
-    Type::scope_level = scope_level;
-    Type::line_num = line_num;
-}
 
 class Array: public Type{
     public:
@@ -37,12 +28,6 @@ class Array: public Type{
         int size;
         Array(Type *, int, int, int);
 };
-Array::Array(Type *type, int size, int scope_level=0, int line_num=1){
-    this->type = type;
-    this->size = size;
-    Type::scope_level = scope_level;
-    Type::line_num = line_num;
-}
 
 class Variable{
     public:
@@ -55,21 +40,7 @@ class Variable{
         Variable(string, Type *, vector<Variable *>, int, int, int);
         int get_size();
 };
-Variable::Variable(string name, Type *type, vector<Variable *> l = {}, int is_func=0, int scope_level = 0, int line_num = 1){
-    this->name = name;
-    this->type = type;
-    this->is_func = is_func;
-    this->line_num = line_num;
-    this->scope_level = scope_level;
-    this->args = vector<Variable *>();
 
-    for(auto it : l){
-        this->args.push_back(it);
-    }
-}
-int Variable::get_size(){
-    return type_size;
-}
 
 class Structure: public Type{
     public:
@@ -82,37 +53,7 @@ class Structure: public Type{
         return (typeid(*this)==typeid(other)) && (name.compare(dynamic_cast<const Structure &>(other).name)==0);
         }
 };
-Structure::Structure(string name, vector<Variable *> fields = {}, int scope_level=0, int line_num=1){
-    this->name = name;
-    Type::scope_level = scope_level;
-    Type::line_num = line_num;
-    this->fields = vector<Variable *>();
 
-    for(auto it : fields){
-        this->fields.push_back(it);
-    }
-
-}
-int Structure::get_size(){
-    int sum = 0;
-    for (auto f: fields){
-        sum += f->get_size();
-    }
-    return sum;
-}
-
-int Structure::get_offset(string name){
-    int size = 0;
-    for (auto it : fields){
-        if (it->name.compare(name)==0){
-            break;
-        }
-        size += it->get_size();
-    }
-    return size;
-}
-
-void init();
 Primitive *handle_Type(Node *node);
 vector<Type *> handle_Args(Node *node);
 Type* handle_Exp(Node *node, bool single=false);
@@ -134,7 +75,5 @@ void handle_ExtDef(Node *node);
 void handle_ExtDefList(Node *node);
 void handle_Program(Node *root);
 
-multimap<string, Variable *> var_map;
-multimap<string, Structure *> strc_map;
-
-#endif
+extern multimap<string, Variable *> var_map;
+extern multimap<string, Structure *> strc_map;

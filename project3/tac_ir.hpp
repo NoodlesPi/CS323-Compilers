@@ -103,9 +103,9 @@ string DecCode::to_instruction(){
     for (auto s: sizes){
         size *= s;
     }
-    sprintf(instruction, "DEC t%d %d", TAC::addr, type_size * size);
-    return instruction;    
-}
+    sprintf(instruction, "DEC t%d %d", TAC::addr, TAC::type->get_size() * size);
+    return instruction;  
+}  
 
 class AssignCode: public TAC{
     public:
@@ -323,7 +323,7 @@ vector<TAC *> tac_list;
 map<string, int> name_to_addr;
 
 int * new_label(int addr = tac_list.size() + 1);
-void init();
+void init_all();
 void back_patch(int addr, int true_list, int false_list);
 void back_loop_patch(vector<int> *addrs, int last, int to);
 void translate_ExtDefList(Node *node);
